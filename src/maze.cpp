@@ -1,4 +1,10 @@
 #include <Arduino.h>
+#include <Servo.h>
+
+Servo myservo;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+
+int pos = 0;  // variable to store the servo position
 
 // Define the pins connected to the L298N module
 int enA = 9;
@@ -16,9 +22,6 @@ const int echo = 11;
 double duration;
 double distance;
 
-// declare a boolean variable
-boolean wallOnRight = false;
-
 void setup() {
   // Set the motor control pins as outputs
   pinMode(enA, OUTPUT);
@@ -31,6 +34,8 @@ void setup() {
   pinMode(trig, OUTPUT);  // sets the trig pin as output
   pinMode(echo, INPUT);   // sets the echo pin as input
   Serial.begin(9600);     // starts the serial communication
+
+  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
 }
 
 void loop() {
