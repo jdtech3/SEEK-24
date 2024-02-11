@@ -19,6 +19,8 @@ double distance;
 // declare a boolean variable
 boolean hitWallAlr = false;
 
+double distMax = 0;
+
 void setup() {
   // Set the motor control pins as outputs
   pinMode(enA, OUTPUT);
@@ -50,7 +52,24 @@ void loop() {
 
   if (distance <= 20 && !hitWallAlr) {
     stop();
-    rotateMotors(250, 100);
+    while (true) {
+      // Read from the echo pin, returns the sound wave travel time in
+      // microseconds
+      duration = pulseIn(echo, HIGH);
+      // Calculate the distance (in cm)
+      distance = duration * 0.034 / 2;
+
+      // Check if the current distance is greater than the current maximum
+      // distance
+      if (distance > distMax) {
+        // Update the maximum distance
+        distMax = distance;
+      } else {
+        // If the current distance is less than the maximum distance, exit the
+        // loop
+        break;
+      }
+    }
     hitWallAlr = !hitWallAlr;
   } else if (distance <= 30 && hitWallAlr) {
     stop();
