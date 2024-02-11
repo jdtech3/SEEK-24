@@ -13,8 +13,8 @@ const int trig = 10;
 const int echo = 11;
 
 // Defining variables for distance calculation
-long duration;
-int distance;
+double duration;
+double distance;
 
 // declare a boolean variable
 boolean hitWallAlr = false;
@@ -36,7 +36,7 @@ void setup() {
 void loop() {
   // clear any previous input
   digitalWrite(trig, LOW);
-  delayMicroseconds(2);
+  delayMicroseconds(2000);
 
   // set trig pin to HIGH for 10 microseconds
   digitalWrite(trig, HIGH);
