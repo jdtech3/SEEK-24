@@ -8,9 +8,58 @@ int enB = 3;
 int in3 = 7;
 int in4 = 4;
 
-// Define input pins for both IR sensors
-const int IR_PIN_1 = 13;
-const int IR_PIN_2 = 2;
+// Defining input pins from the ultrasonic sensor
+const int trig = 10;
+const int echo = 11;
+
+// Defining variables for distance calculation
+long duration;
+int distance;
+
+// declare a boolean variable
+boolean hitWallAlr = false;
+
+void setup() {
+  // Set the motor control pins as outputs
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(enB, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+
+  pinMode(trig, OUTPUT);  // sets the trig pin as output
+  pinMode(echo, INPUT);   // sets the echo pin as input
+  Serial.begin(9600);     // starts the serial communication
+}
+
+void loop() {
+  // clear any previous input
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+
+  // set trig pin to HIGH for 10 microseconds
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  // read from the echo pin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echo, HIGH);
+  // calculate the distance (in cm)
+  distance = duration * 0.034 / 2;
+
+  if (distance <= 20 && !hitWallAlr) {
+    stop();
+    rotateMotors(250, 100);
+    hitWallAlr = !hitWallAlr;
+  } else if (distance <= 30 && hitWallAlr) {
+    stop();
+    rotateMotors(100, 250);
+    hitWallAlr = !hitWallAlr;
+  } else {
+    moveMotors(200);
+  }
+}
 
 void moveMotors(int speed) {
   // Move both motors forward
@@ -38,49 +87,9 @@ void rotateMotors(int speedA, int speedB) {
   // Rotate motors in opposite directions to achieve rotation
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
   // Set speeds for each motor
   analogWrite(enA, speedA);
   analogWrite(enB, speedB);
-}
-
-void setup() {
-  // Set the motor control pins as outputs
-  pinMode(enA, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(enB, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
-
-  // Enable PWM for Motor A and Motor B
-  analogWrite(enA, 200);  // Adjust the speed for Motor A as needed
-  analogWrite(enB, 200);  // Adjust the speed for Motor B as needed
-
-  // Set the IR sensor pins as inputs
-  pinMode(IR_PIN_1, INPUT);
-  pinMode(IR_PIN_2, INPUT);
-}
-
-void loop() {
-  // Read the value from the IR sensors
-  int IR_SEN_1 = digitalRead(IR_PIN_1);
-  int IR_SEN_2 = digitalRead(IR_PIN_2);
-
-  // Line-tracking control logic
-  if (IR_SEN_1 == 0 && IR_SEN_2 == 0) {
-    // We are following the line correctly; move both motors at max speed.
-    moveMotors(100);
-  } else if (IR_SEN_1 == 0 && IR_SEN_2 == 1) {
-    // Turn towards IR sensor 2 for a bit
-    rotateMotors(200, 0);
-  } else if (IR_SEN_1 == 1 && IR_SEN_2 == 0) {
-    // Turn towards IR sensor 1 for a bit
-    rotateMotors(0, 200);
-  } else if (IR_SEN_1 == 1 && IR_SEN_2 == 1) {
-    moveMotors(100);
-  } else {
-    moveMotors(100);
-  }
 }
