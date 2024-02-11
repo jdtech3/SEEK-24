@@ -17,7 +17,7 @@ double duration;
 double distance;
 
 // declare a boolean variable
-boolean hitWallAlr = false;
+boolean wallOnRight = false;
 
 void setup() {
   // Set the motor control pins as outputs
@@ -50,14 +50,41 @@ void loop() {
 
   if (distance <= 20) {
     stop();
-    rotateMotors(250, 100);
-    hitWallAlr = !hitWallAlr;
-  } else if (distance <= 30 && hitWallAlr) {
-    stop();
-    rotateMotors(100, 250);
-    hitWallAlr = !hitWallAlr;
-  } else {
-    moveMotors(200);
+    for (pos = 0; pos <= 90;
+         pos += 1) {       // turn servo carrying ultrasonic sensor right
+      myservo.write(pos);  // tell servo to go to position in variable 'pos'
+      delay(5);
+    }
+    // clear any previous input
+    digitalWrite(trig, LOW);
+    delayMicroseconds(2000);
+    // set trig pin to HIGH for 10 microseconds
+    digitalWrite(trig, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trig, LOW);
+    // read from the echo pin, returns the sound wave travel time in
+    // microseconds
+    duration = pulseIn(echo, HIGH);
+    // calculate the distance (in cm)
+    distance = duration * 0.034 / 2;
+    if (distance <= 20) {
+      for (pos = 90; pos >= 0; pos -= 1) {  // turn servo back to 0
+        myservo.write(pos);  // tell servo to go to position in variable 'pos'
+        delay(5);
+      }
+      rotateMotors(50, 150);
+    } else {
+      // turning right is a good route
+      // reset servo
+      for (pos = 90; pos >= 0; pos -= 1) {  // turn servo back to 0
+        myservo.write(pos);  // tell servo to go to position in variable 'pos'
+        delay(5);
+      }
+      // turn right
+      rotateMotors(150, 50);
+    }
+  } else {  // no obstacles
+    moveMotors(150);
   }
 }
 
