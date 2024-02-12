@@ -3,6 +3,9 @@
 #include "bt.hpp"
 #include "pins.hpp"
 
+// Credits: slightly modified version of:
+//      https://github.com/rsx-utoronto/SEEK/blob/main/starter_code/basic_driving_w_bt_red/basic_driving_w_bt_red.ino
+
 /* Bluetooth Interfacing with Arduino to drive a rover.
 
 
